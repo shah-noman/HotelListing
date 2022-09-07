@@ -1,3 +1,6 @@
+using HotelListing.Configurations;
+using HotelListing.Data;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -36,7 +39,10 @@ builder.Services.AddCors(o =>
     builder.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());  
-}); 
+});
+builder.Services.AddAutoMapper(typeof(MapperInitilizer));   
+builder.Services.AddDbContext<DatabaseConext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
