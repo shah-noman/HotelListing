@@ -3,7 +3,7 @@ using HotelListing.IRepasitary;
 
 namespace HotelListing.Repository
 {
-    public class UnitOfWork : IUnitofWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly DatabaseConext _context;
         private IGenericRepository<Country> _countries;

@@ -1,5 +1,8 @@
 using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.IRepasitary;
+using HotelListing.Repository;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -29,7 +32,8 @@ finally
 {
     Log.CloseAndFlush();
 }
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(op => 
+op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,7 +44,8 @@ builder.Services.AddCors(o =>
     .AllowAnyMethod()
     .AllowAnyHeader());  
 });
-builder.Services.AddAutoMapper(typeof(MapperInitilizer));   
+builder.Services.AddAutoMapper(typeof(MapperInitilizer));
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<DatabaseConext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
 var app = builder.Build();
@@ -53,9 +58,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthorization();
+//app.UseEndpoints(endpoints =>
 
+//{
+
+//    endpoints.MapControllerRoute(
+//      name: "defult",
+//      pattern: "{controller=Home}/{action=Index}/{id?}"); 
+//    endpoints.MapControllers();
+//});
 app.MapControllers();
 app.UseCors("AllowAll");
 app.Run();

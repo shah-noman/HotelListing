@@ -2,7 +2,7 @@
 
 namespace HotelListing.IRepasitary
 {
-    public interface IUnitofWork : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         IGenericRepository<Country> Countries { get; }
         IGenericRepository<Hotel> Hotels { get; } 
