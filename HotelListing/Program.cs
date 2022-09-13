@@ -1,16 +1,26 @@
+ 
+using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
 using HotelListing.IRepasitary;
 using HotelListing.Repository;
+using HotelListing.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
+  
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+ 
 
 // Add services to the container.
- 
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
 
@@ -37,6 +47,29 @@ op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandl
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        
+        IssuerSigningKey = new SymmetricSecurityKey
+        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ValidateIssuer = true,
+         
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
+    };
+});
+builder.Services.ConfigureIdentity();
+//builder.Services.ConfigureJWT();
+builder.Services.AddAuthorization();
+
 builder.Services.AddCors(o =>
 {
     o.AddPolicy("AllowAll", builder =>
@@ -46,9 +79,14 @@ builder.Services.AddCors(o =>
 });
 builder.Services.AddAutoMapper(typeof(MapperInitilizer));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthManager, AuthManager>();
 builder.Services.AddDbContext<DatabaseConext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
+
+ 
 var app = builder.Build();
+
+ 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -60,6 +98,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
+app.UseAuthentication();
+  
 //app.UseEndpoints(endpoints =>
 
 //{
