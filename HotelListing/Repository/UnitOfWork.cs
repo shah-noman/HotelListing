@@ -5,10 +5,10 @@ namespace HotelListing.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DatabaseConext _context;
+        private readonly DatabaseContext _context;
         private IGenericRepository<Country> _countries;
         private IGenericRepository<Hotel> _hotels;
-        public UnitOfWork(DatabaseConext context)
+        public UnitOfWork(DatabaseContext context)
         {
             _context = context;
             

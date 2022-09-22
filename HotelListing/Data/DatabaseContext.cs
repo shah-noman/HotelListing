@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Data
 {
-    public class DatabaseConext : IdentityDbContext<ApiUser>
+    public class DatabaseContext : IdentityDbContext<ApiUser>
     {
-        public DatabaseConext(DbContextOptions options) : base(options)
-        {}
+        public DatabaseContext(DbContextOptions options) : base(options)
+        { }
 
-         
+
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
 
@@ -19,10 +19,11 @@ namespace HotelListing.Data
             builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new CountryConfiguration());
             builder.ApplyConfiguration(new HotelConfiguration());
-            
-               
-                
+
+
+
         }
 
     }
 }
+ 

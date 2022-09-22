@@ -32,7 +32,7 @@ namespace HotelListing.Controllers
             _authManager = authManager;
         }
         [HttpPost]
-        [Route("register")]
+        [Route("SingIn")]
         public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             _logger.LogInformation($"Registration Attempt for {userDTO.Email}");
@@ -94,9 +94,9 @@ namespace HotelListing.Controllers
         }
 
     }
- 
 
 
 
-        }
-    
+
+}
+

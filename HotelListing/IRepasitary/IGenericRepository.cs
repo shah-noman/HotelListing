@@ -12,7 +12,7 @@ namespace HotelListing.IRepasitary
         Task<T> Get (Expression<Func<T, bool>>expression,List<string> includes = null);
         Task Insert(T entity);
         Task InsertRange(IEnumerable<T> entites);
-        Task Delek(int id);
+        Task Delete(int id);
         void Delete(IEnumerable<T> entites);
         void Update(T entity);
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelListing.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20220912063551_AddedDefaultRoles")]
-    partial class AddedDefaultRoles
+    [Migration("20220919113246_IdentityUser")]
+    partial class IdentityUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -222,15 +222,15 @@ namespace HotelListing.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "74dae260-10e5-473c-93d4-0a9fc292bc53",
-                            ConcurrencyStamp = "63c1f583-62cd-4a57-b976-06e79fc1c5d3",
+                            Id = "49ddfadb-048f-47ef-b47a-c9c920ac9d47",
+                            ConcurrencyStamp = "83240340-04ce-495d-928c-8cbf65eb270f",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "793d3a9a-9440-450b-bd95-89034eaaf0e7",
-                            ConcurrencyStamp = "62aeffd6-1ef1-49f9-b49b-4f1a7e8f1999",
+                            Id = "2dbc172a-3428-4d63-87fe-c5cd3322e9fe",
+                            ConcurrencyStamp = "57a0b21b-bdca-48c7-9c64-13783e864c5b",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

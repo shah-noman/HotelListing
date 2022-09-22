@@ -8,10 +8,10 @@ namespace HotelListing.Repository
 
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly DatabaseConext _context;
+        private readonly DatabaseContext _context;
         private readonly DbSet<T> _db;
 
-        public GenericRepository(DatabaseConext context)
+        public GenericRepository(DatabaseContext context)
         {
             _context=context;
             _db = _context.Set<T>(); 
@@ -19,7 +19,7 @@ namespace HotelListing.Repository
         }
 
 
-        public async Task Delek(int id)
+        public async Task Delete(int id)
         {
             var entity = await _db.FindAsync(id);
             _db.Remove(entity); 

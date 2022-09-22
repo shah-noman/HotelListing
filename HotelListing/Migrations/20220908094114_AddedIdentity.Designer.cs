@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HotelListing.Migrations
 {
-    [DbContext(typeof(DatabaseConext))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220908094114_AddedIdentity")]
     partial class AddedIdentity
     {

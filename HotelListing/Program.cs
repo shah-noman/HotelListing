@@ -1,4 +1,3 @@
- 
 using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
@@ -11,13 +10,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-  
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
- 
+ConfigurationManager Configuration = builder.Configuration;
+
 
 // Add services to the container.
 
@@ -36,38 +37,48 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application is FAild To start "); 
+    Log.Fatal(ex, "Application is FAild To start ");
 }
 finally
 {
     Log.CloseAndFlush();
 }
-builder.Services.AddControllers().AddNewtonsoftJson(op => 
-op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAuthentication(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-    o.TokenValidationParameters = new TokenValidationParameters
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListinge", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        
-        IssuerSigningKey = new SymmetricSecurityKey
-        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        ValidateIssuer = true,
-         
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
-    };
+        Description = "Jwt Authorization",  
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                         new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id= "Bearer"
+                        }
+                    },
+                    new string[]{}
+                    }
+                });
+
 });
+builder.Services.AddAuthentication(); 
 builder.Services.ConfigureIdentity();
-//builder.Services.ConfigureJWT();
+ builder.Services.ConfigureJWT(Configuration);
 builder.Services.AddAuthorization();
 
 builder.Services.AddCors(o =>
@@ -75,40 +86,40 @@ builder.Services.AddCors(o =>
     o.AddPolicy("AllowAll", builder =>
     builder.AllowAnyOrigin()
     .AllowAnyMethod()
-    .AllowAnyHeader());  
+    .AllowAnyHeader());
 });
 builder.Services.AddAutoMapper(typeof(MapperInitilizer));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthManager, AuthManager>();
-builder.Services.AddDbContext<DatabaseConext>(options =>
+builder.Services.AddDbContext<DatabaseContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
 
- 
+
 var app = builder.Build();
 
- 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing"));
 }
 
+
 app.UseHttpsRedirection();
-app.UseRouting();
-app.UseAuthorization();
-app.UseAuthentication();
-  
-//app.UseEndpoints(endpoints =>
-
-//{
-
-//    endpoints.MapControllerRoute(
-//      name: "defult",
-//      pattern: "{controller=Home}/{action=Index}/{id?}"); 
-//    endpoints.MapControllers();
-//});
-app.MapControllers();
 app.UseCors("AllowAll");
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+ 
+
+ app.UseEndpoints(endpoints =>
+
+ {
+
+     endpoints.MapControllers();
+       
+ });
+ 
+ 
 app.Run();
