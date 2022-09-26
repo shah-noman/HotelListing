@@ -50,18 +50,11 @@ namespace HotelListing.Controllers
          
         public async Task<IActionResult> GetHotel (int id)
         {
-            try
-            {
+            
                 var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id, new List<string> { "Country" });
                 var result = _mapper.Map<HotelDTO>(hotel);
                 return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"SOmething went worng in the {nameof(GetHotel)}");
-                return StatusCode(500, "Internal server error. place try Again latter");
-
-            }
+            
         }
          [Authorize(Roles = "Administrator")]
         [HttpPost]
@@ -77,21 +70,13 @@ namespace HotelListing.Controllers
                 _logger.LogError($"Invalid POST attempt in {nameof(CreateHotel)}");
                 return BadRequest(ModelState);
              }
-            try
-            {
+             
                 var hotel = _mapper.Map<Hotel>(hotelDTO);
                 await _unitOfWork.Hotels.Insert(hotel);
                 await _unitOfWork.Save();
                 
                 return CreatedAtRoute("GetHotel",new {id = hotel.Id}, hotel);  
-            }
-            catch (Exception ex)
-            {
-
-                _logger.LogError(ex, $"SOmething went worng in the {nameof(GetHotel)}");
-                return StatusCode(500, "Internal server error. place try Again latter");
-
-            }
+          
 
         }
 
@@ -108,8 +93,7 @@ namespace HotelListing.Controllers
                 _logger.LogError($"Invalide UPDATE Attempt in {nameof(UpdateHotel)}");
                 return BadRequest(ModelState);
             }
-            try
-            {
+             
                 var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id);
                 if(hotel == null)
                 {
@@ -121,13 +105,7 @@ namespace HotelListing.Controllers
                 await _unitOfWork.Save();
 
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-
-                _logger.LogError(ex, $"SOmething went worng in the {nameof(UpdateHotel)}");
-                return StatusCode(500, "Internal server error. place try Again latter");
-            }
+            
         }
 
 
@@ -143,8 +121,7 @@ namespace HotelListing.Controllers
             _logger.LogError($"Invalide Delete Attempt in {nameof(DeleteHotel)}");
             return BadRequest(ModelState);
         }
-        try
-        {
+         
             var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id);
             if (hotel == null)
             {
@@ -156,14 +133,8 @@ namespace HotelListing.Controllers
                   await _unitOfWork.Save();
 
             return NoContent();
-        }
-        catch (Exception ex)
-        {
 
-            _logger.LogError(ex, $"SOmething went worng in the {nameof(DeleteHotel)}");
-            return StatusCode(500, "Internal server error. place try Again latter");
         }
-    }
 }
 }
 

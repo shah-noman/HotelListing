@@ -1,3 +1,5 @@
+
+using AspNetCoreRateLimit;
 using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
@@ -7,6 +9,7 @@ using HotelListing.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -43,7 +46,14 @@ finally
 {
     Log.CloseAndFlush();
 }
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(config =>
+{
+    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+    {
+        Duration = 120
+    });
+}
+).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
@@ -76,7 +86,13 @@ builder.Services.AddSwaggerGen(c =>
                 });
 
 });
-builder.Services.AddAuthentication(); 
+builder.Services.AddResponseCaching();
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimiting();
+builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureHttpCacheHeader();
+builder.Services.AddAuthentication();
+builder.Services.ConfigureVersioning();
 builder.Services.ConfigureIdentity();
  builder.Services.ConfigureJWT(Configuration);
 builder.Services.AddAuthorization();
@@ -108,10 +124,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
+app.UseIpRateLimiting();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
- 
+app.ConfigureExceptionHandler();
 
  app.UseEndpoints(endpoints =>
 

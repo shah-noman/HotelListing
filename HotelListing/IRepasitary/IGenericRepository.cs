@@ -1,5 +1,8 @@
 ﻿using System.Linq.Expressions;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using HotelListing.Models;
+using X.PagedList;
+
 namespace HotelListing.IRepasitary
 {
     public interface IGenericRepository<T> where T : class
@@ -9,6 +12,14 @@ namespace HotelListing.IRepasitary
        Func<IQueryable<T>, IOrderedQueryable <T>> orderBy = null,  
         List<string> includes = null
             );
+        Task<IPagedList<T>> GetPagedList(
+
+            RequestParams requestParams,
+            List<string> includes = null
+          );
+
+
+
         Task<T> Get (Expression<Func<T, bool>>expression,List<string> includes = null);
         Task Insert(T entity);
         Task InsertRange(IEnumerable<T> entites);
